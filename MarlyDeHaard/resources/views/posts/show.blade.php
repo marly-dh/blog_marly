@@ -12,7 +12,8 @@
 
                         <p class="mb-4">{{ $post->content }}</p>
 
-                        <span class="text-gray-500">Posted at: {{ $post->created_at }}</span>
+                        <span class="text-gray-500 block">Posted at: {{ $post->created_at }}</span>
+                        <span class="text-gray-500">Author: {{ $author->name }}</span>
                     </div>
                 </div>
             </div>

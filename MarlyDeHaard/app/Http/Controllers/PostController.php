@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -14,10 +17,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::latest()->paginate(5);
+        $posts = DB::table('posts')->where('user_id', Auth::user()->getAuthIdentifier())->get();
 
-        return view('posts.index',compact('posts'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+        return view('posts.index',compact('posts'));
     }
 
     /**
@@ -44,7 +46,10 @@ class PostController extends Controller
             'content' => 'required',
         ]);
 
-        Post::create($request->all());
+        $data = $request->all();
+        $data += ['user_id' => Auth::user()->getAuthIdentifier()];
+
+        Post::create($data);
 
         return redirect()->route('posts.index')
             ->with('success','Post created successfully.');
@@ -58,7 +63,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view('posts.show',compact('post'));
+        $author = DB::table('users')->where('id', $post->user_id)->first();
+
+        return view('posts.show',compact('post', 'author'));
     }
 
     /**
@@ -87,7 +94,8 @@ class PostController extends Controller
             'content' => 'required',
         ]);
 
-        $post->update($request->all());
+        if ($post->user_id === Auth::user()->getAuthIdentifier())
+            $post->update($request->all());
 
         return redirect()->route('posts.index')
             ->with('success','Post updated successfully');
@@ -101,7 +109,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        $post->delete();
+        if ($post->user_id === Auth::user()->getAuthIdentifier())
+            $post->delete();
 
         return redirect()->route('posts.index')
             ->with('success','Post deleted successfully');
