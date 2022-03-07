@@ -14,9 +14,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $data = Post::latest()->paginate(5);
+        $posts = Post::latest()->paginate(5);
 
-        return view('posts.index',compact('data'))
+        return view('posts.index',compact('posts'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
@@ -41,6 +41,7 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'required',
+            'content' => 'required',
         ]);
 
         Post::create($request->all());
@@ -83,6 +84,7 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'required',
+            'content' => 'required',
         ]);
 
         $post->update($request->all());
