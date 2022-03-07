@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Models\post;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,11 +18,13 @@ use App\Http\Controllers\PostController;
 Route::resource('posts', PostController::class);
 
 Route::get('/', function () {
-    return view('welcome');
+    $posts = Post::all();
+
+    return view('welcome', compact('posts'));
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect('posts');
 })->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
